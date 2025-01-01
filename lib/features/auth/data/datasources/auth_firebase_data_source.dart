@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../../../../core/errors/exceptions.dart';
+import '../../../../notification_service.dart';
 import '../models/user_model.dart';
 
 abstract interface class AuthFirebaseDataSource {
@@ -25,9 +26,11 @@ abstract interface class AuthFirebaseDataSource {
 class AuthFirebaseDataSourceImpl extends AuthFirebaseDataSource {
   final FirebaseAuth firebaseAuth;
   final FirebaseMessaging firebaseMessaging;
+  final NotificationService notificationService;
 
 
-  AuthFirebaseDataSourceImpl(this.firebaseAuth, this.firebaseMessaging);
+
+  AuthFirebaseDataSourceImpl(this.firebaseAuth, this.firebaseMessaging, this.notificationService);
 
   @override
   Future<UserModel> loginWithEmailPassword({
@@ -61,7 +64,7 @@ class AuthFirebaseDataSourceImpl extends AuthFirebaseDataSource {
           var user = firebaseAuth.currentUser;
           final userId = user?.uid;
 
-          String? fcmToken = await firebaseMessaging.getToken();
+          String? fcmToken = await notificationService.getToken();
 
           Map<String, dynamic> userData = {
             'userId': userId,

@@ -35,7 +35,8 @@ void _initAuth() {
   serviceLocator.registerFactory<AuthFirebaseDataSource>(
     () => AuthFirebaseDataSourceImpl(
       serviceLocator<FirebaseAuth>(),
-      serviceLocator<FirebaseMessaging>()
+      serviceLocator<FirebaseMessaging>(),
+      serviceLocator<NotificationService>()
     ),
   );
   serviceLocator.registerFactory<ForgetPasswordDataSource>(

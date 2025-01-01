@@ -31,7 +31,7 @@ class NotificationService {
     // Handle messages when the app is in the background or terminated
     FirebaseMessaging.onBackgroundMessage(_onBackgroundMessage);
   }
-  static Future<String?> getToken() async{
+  Future<String?> getToken() async{
     return await _firebaseMessaging.getToken();
   }
   // Handle notification when the app is in the foreground
