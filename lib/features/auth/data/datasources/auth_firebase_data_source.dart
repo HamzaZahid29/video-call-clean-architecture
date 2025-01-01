@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/utils/static_database_maps.dart';
@@ -10,7 +11,6 @@ abstract interface class AuthFirebaseDataSource {
     required String email,
     required String password,
     required String name,
-    required String role,
   });
 
   Future<UserModel> loginWithEmailPassword({
@@ -25,8 +25,10 @@ abstract interface class AuthFirebaseDataSource {
 
 class AuthFirebaseDataSourceImpl extends AuthFirebaseDataSource {
   final FirebaseAuth firebaseAuth;
+  final FirebaseMessaging firebaseMessaging;
 
-  AuthFirebaseDataSourceImpl(this.firebaseAuth);
+
+  AuthFirebaseDataSourceImpl(this.firebaseAuth, this.firebaseMessaging);
 
   @override
   Future<UserModel> loginWithEmailPassword({
@@ -47,11 +49,11 @@ class AuthFirebaseDataSourceImpl extends AuthFirebaseDataSource {
   }
 
   @override
-  Future<UserModel> signUpWithEmailPassword(
-      {required String email,
-      required String password,
-      required String name,
-      required String role}) async {
+  Future<UserModel> signUpWithEmailPassword({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
     try {
       await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password)
@@ -59,14 +61,18 @@ class AuthFirebaseDataSourceImpl extends AuthFirebaseDataSource {
         if (firebaseAuth.currentUser != null) {
           var user = firebaseAuth.currentUser;
           final userId = user?.uid;
+
+          String? fcmToken = await FirebaseMessaging.instance.getToken();
+
           Map<String, dynamic> userData = {
             'userId': userId,
             'name': name,
-            'role': role,
             'email': email,
             'createdAt': FieldValue.serverTimestamp(),
             'profilePictureUrl': null,
+            'fcmToken': fcmToken,  // Save the FCM token here
           };
+
           try {
             await FirebaseFirestore.instance
                 .collection('users')
@@ -76,66 +82,24 @@ class AuthFirebaseDataSourceImpl extends AuthFirebaseDataSource {
               print('Error occurred while saving user data: $e');
               throw ServerException('Error saving user data: $e');
             });
-            await FirebaseFirestore.instance
-                .collection('user-notifications')
-                .doc(user.uid)
-                .set({
-              'userId': user.uid,
-              'notifications': [],
-            }).catchError((e) {
-              throw ServerException('Error saving user data: $e');
-            });
-            if (role == 'Caregiver') {
-              await FirebaseFirestore.instance
-                  .collection('caregiver-documents')
-                  .doc(user!.uid)
-                  .set({
-                'documents': StaticDatabaseMaps.caregiverDefaultDatabaseMap,
-              }).catchError((e) {
-                print('Error occurred while saving user data: $e');
-                throw ServerException('Error saving user data: $e');
-              });
-
-              await FirebaseFirestore.instance
-                  .collection('caregiver-reports')
-                  .doc(user.uid)
-                  .set({
-                'caregiverId': user.uid,
-                'arrayOfAssignedTasks': [],
-                'isAvailable': true,
-                'arrayOfCompletedTasks': [],
-              }).catchError((e) {
-                print('Error occurred while saving user data: $e');
-                throw ServerException('Error saving user data: $e');
-              });
-            } else if (role == 'Caretaker') {
-              await FirebaseFirestore.instance
-                  .collection('caretaker-documents')
-                  .doc(user!.uid)
-                  .set({
-                'documents': StaticDatabaseMaps.caretakerDefaultDatabaseMap,
-              }).catchError((e) {
-                print('Error occurred while saving user data: $e');
-                throw ServerException('Error saving user data: $e');
-              });
-            }
           } catch (e) {
-            print('Error while adding user to Firestore: ${e.toString()}');
-            throw ServerException(
-                'Error while adding user to Firestore: ${e.toString()}');
+            print('Error in Firestore saving: $e');
+            throw ServerException('Error in Firestore saving: $e');
           }
-        } else {
-          throw ServerException('User is null');
         }
       });
+
       if (firebaseAuth.currentUser == null) {
         throw ServerException('User is null');
       }
+
       return await getCurrentUser();
     } catch (e) {
+      print('Error during signup: $e');
       throw ServerException(e.toString());
     }
   }
+
 
   @override
   Future<UserModel> getCurrentUser() async {

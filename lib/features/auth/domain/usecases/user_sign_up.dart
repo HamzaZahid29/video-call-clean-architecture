@@ -13,15 +13,14 @@ class UserSignUp implements UseCase<User, UserSignUpParams>{
   @override
 
   Future<Either<Failure, User>> call(UserSignUpParams params) async{
-    return await authRepository.signUpWithEmailPassword(name: params.name, email: params.email, password: params.password, role: params.role);
+    return await authRepository.signUpWithEmailPassword(name: params.name, email: params.email, password: params.password);
   }
 }
 class UserSignUpParams{
   final String email;
   final String password;
   final String name;
-  final String role;
 
-  UserSignUpParams({required this.email,required this.password, required this.name, required this.role});
+  UserSignUpParams({required this.email,required this.password, required this.name,});
 
 }

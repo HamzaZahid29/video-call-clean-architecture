@@ -29,7 +29,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController userNameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  String? selectedRole;
 
   @override
   void dispose() {
@@ -134,24 +133,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             formFieldValidator:
                             TextFieldValidators.passwordValidator,
                           ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'Choose Your Role',
-                            style: AppTextStyles.titleSmall,
-                          ),
-                          // AuthDropdownMenu<String>(
-                          //   label: 'Select Your Role',
-                          //   items: AppDropdownMenuItems.rolesDropdownMenuItems,
-                          //   value: null,
-                          //   onChanged: (newValue) {
-                          //     setState(() {
-                          //       selectedRole = newValue;
-                          //     });
-                          //   },
-                          //   formFieldValidator: (value) => value == null
-                          //       ? 'Please select an option'
-                          //       : null,
-                          // ),
                           const SizedBox(height: 20),
                           Row(
                             children: [
@@ -163,7 +144,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           : () {
                                         if (_formKey.currentState!
                                             .validate()) {
-                                          if (selectedRole != null) {
                                             context.read<AuthBloc>().add(
                                                 AuthSignUp(
                                                     email: emailController.text
@@ -176,11 +156,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                                     userNameController
                                                         .text
                                                         .trim(),
-                                                    role: selectedRole!));
-                                          } else {
-                                            showSnackbar(
-                                                context, 'Select a role');
-                                          }
+                                                ));
                                         }
                                       })),
                             ],
