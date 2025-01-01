@@ -105,6 +105,7 @@ class AuthFirebaseDataSourceImpl extends AuthFirebaseDataSource {
 
   @override
   Future<UserModel> getCurrentUser() async {
+    print('Get current user called');
     try {
       final currentUser = firebaseAuth.currentUser;
       if (currentUser == null) {
@@ -125,12 +126,31 @@ class AuthFirebaseDataSourceImpl extends AuthFirebaseDataSource {
         throw ServerException('User document is empty');
       }
 
+      print(userData['userId']);
+      print(userData['email']);
+      print(userData['name']);
+      print(userData['profilePictureUrl']);
+      print(userData['fcmToken']);
+
+final userModel = UserModel(
+  userId: userData['userId'] as String,
+  email: userData['email'] as String,
+  userName: userData['name'] as String,
+  userProfilePicPath: userData['profilePictureUrl']?? '' as String?,
+  fcmToken: userData['fcmToken'] as String,
+);
+      print(userData['userId']);
+      print(userData['email']);
+      print(userData['name']);
+      print(userData['profilePictureUrl']);
+      print(userData['fcmToken']);
+
       return UserModel(
         userId: userData['userId'] as String,
         email: userData['email'] as String,
         userName: userData['name'] as String,
         userProfilePicPath: userData['profilePictureUrl'] as String?,
-        userRole: userData['role'] as String,
+        fcmToken: userData['fcmToken'] as String,
       );
     } on FirebaseException catch (firestoreError) {
       print('FirebaseException: ${firestoreError.message}');
