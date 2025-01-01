@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../../../../core/errors/exceptions.dart';
-import '../../../../core/utils/static_database_maps.dart';
 import '../models/user_model.dart';
 
 abstract interface class AuthFirebaseDataSource {
@@ -62,7 +61,7 @@ class AuthFirebaseDataSourceImpl extends AuthFirebaseDataSource {
           var user = firebaseAuth.currentUser;
           final userId = user?.uid;
 
-          String? fcmToken = await FirebaseMessaging.instance.getToken();
+          String? fcmToken = await firebaseMessaging.getToken();
 
           Map<String, dynamic> userData = {
             'userId': userId,
@@ -70,7 +69,7 @@ class AuthFirebaseDataSourceImpl extends AuthFirebaseDataSource {
             'email': email,
             'createdAt': FieldValue.serverTimestamp(),
             'profilePictureUrl': null,
-            'fcmToken': fcmToken,  // Save the FCM token here
+            'fcmToken': fcmToken,
           };
 
           try {

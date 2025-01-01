@@ -9,6 +9,7 @@ import 'features/auth/presentation/blocs/auth_bloc/auth_bloc.dart';
 import 'features/auth/presentation/blocs/forget_password_bloc/forget_password_bloc.dart';
 import 'firebase_options.dart';
 import 'init_dependencies.dart';
+import 'notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Future.delayed(const Duration(seconds: 2));
@@ -16,6 +17,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await initDependencies();
+  serviceLocator.get<NotificationService>().initialize();
   runApp(MultiBlocProvider(
     providers: [
       BlocProvider(

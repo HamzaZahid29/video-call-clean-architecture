@@ -17,6 +17,7 @@ import 'features/auth/domain/usecases/user_logout.dart';
 import 'features/auth/domain/usecases/user_sign_up.dart';
 import 'features/auth/presentation/blocs/auth_bloc/auth_bloc.dart';
 import 'features/auth/presentation/blocs/forget_password_bloc/forget_password_bloc.dart';
+import 'notification_service.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -26,6 +27,7 @@ Future<void> initDependencies() async {
   serviceLocator.registerLazySingleton(() => FirebaseAuth.instance);
   serviceLocator.registerLazySingleton(() => FirebaseFirestore.instance);
   serviceLocator.registerLazySingleton(() => FirebaseMessaging.instance);
+  serviceLocator.registerLazySingleton(() => NotificationService());
   serviceLocator.registerLazySingleton(() => AppUserCubit());
 }
 
