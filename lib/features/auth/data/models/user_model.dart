@@ -6,13 +6,13 @@ class UserModel extends User {
     required String email,
     required String userName,
     String? userProfilePicPath,
-    required String userRole,
+    required String fcmToken,
   }) : super(
     userId: userId,
     email: email,
     userName: userName,
     userProfilePicPath: userProfilePicPath ?? '',
-    userRole: userRole,
+    fcmToken: fcmToken,
   );
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -21,7 +21,7 @@ class UserModel extends User {
       email: json['email'] as String,
       userName: json['name'] as String,
       userProfilePicPath: json['profilePictureUrl'] as String?,
-      userRole: json['role'] as String,
+      fcmToken: json['fcmToken'] as String,
     );
   }
 
@@ -31,7 +31,7 @@ class UserModel extends User {
       'email': email,
       'name': userName,
       'profilePictureUrl': userProfilePicPath,
-      'role': userRole,
+      'fcmToken': fcmToken,
     };
   }
 }

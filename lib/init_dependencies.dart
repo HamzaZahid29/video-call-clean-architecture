@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get_it/get_it.dart';
 import 'core/common/bloc/app_user/app_user_cubit.dart';
 import 'core/common/bloc/password_visibility/password_visibility_cubit.dart';
@@ -16,6 +17,7 @@ import 'features/auth/domain/usecases/user_logout.dart';
 import 'features/auth/domain/usecases/user_sign_up.dart';
 import 'features/auth/presentation/blocs/auth_bloc/auth_bloc.dart';
 import 'features/auth/presentation/blocs/forget_password_bloc/forget_password_bloc.dart';
+import 'notification_service.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -24,6 +26,8 @@ Future<void> initDependencies() async {
   _initPasswordVisibilityCubit();
   serviceLocator.registerLazySingleton(() => FirebaseAuth.instance);
   serviceLocator.registerLazySingleton(() => FirebaseFirestore.instance);
+  serviceLocator.registerLazySingleton(() => FirebaseMessaging.instance);
+  serviceLocator.registerLazySingleton(() => NotificationService());
   serviceLocator.registerLazySingleton(() => AppUserCubit());
 }
 
@@ -31,6 +35,8 @@ void _initAuth() {
   serviceLocator.registerFactory<AuthFirebaseDataSource>(
     () => AuthFirebaseDataSourceImpl(
       serviceLocator<FirebaseAuth>(),
+      serviceLocator<FirebaseMessaging>(),
+      serviceLocator<NotificationService>()
     ),
   );
   serviceLocator.registerFactory<ForgetPasswordDataSource>(
